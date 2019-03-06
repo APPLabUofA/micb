@@ -15,6 +15,14 @@ rand('twister',seed);
 global w bgcolor rect gaborPatch arrayRects rotation centerOfArray ...
     direction movementIncrement fixationSize fixationColor fixationRect
 
+% /////////////////////////////////////////////////////////////////////////
+%% Input
+Info.number = input('Participant Number:','s');
+Info.date = datestr(now,30); % 'dd-mmm-yyyy HH:MM:SS' 
+% output file will be named after the inputs
+Filename = [Info.number '--' Info.date '_data.mat'];
+
+% /////////////////////////////////////////////////////////////////////////
 %% Basic parameters
 bgcolor = [128 128 128];
 [w rect] = Screen('OpenWindow',0,bgcolor);
@@ -52,19 +60,21 @@ feedbackPause = .5;
 soas = [-3:1:3];
 nsoas = length(soas);
 
+% /////////////////////////////////////////////////////////////////////////
 %% Read in image
 Screen('BlendFunction',w,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 [gaborMatrix map alpha] = imread('single_gabor_75px.png');
 gaborMatrix(:,:,4) = alpha(:,:);
 gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
+% /////////////////////////////////////////////////////////////////////////
 %% Counterbalancing
 reps = 5; % Number of reps per angle condition per direction
 trialList = [repmat(1:numberOfGabors,1,3*reps);...  %list of which target
     zeros(1,numberOfGabors*reps) ...  %list of which angle
     repmat(90,1,numberOfGabors*reps)...
     repmat(270,1,numberOfGabors*reps)];
-    %list of which direction
+%list of which direction
 trialList = [trialList trialList; ...
         zeros(1,numberOfGabors*3*reps) ones(1,numberOfGabors*3*reps)]; 
 trialList = trialList(:,randperm(length(trialList)));
@@ -73,6 +83,7 @@ trialList = trialList';
 practiceList = practiceList';
 totalTrials = length(trialList);
 
+% /////////////////////////////////////////////////////////////////////////
 %% Array Center Points
 for i = 1:numberOfGabors
     arrayCenters(i,1) = r*cos((i-1)*(2*pi/numberOfGabors));
@@ -83,22 +94,23 @@ centeredRects = [arrayCenters arrayCenters] + ...
         round(repmat([xc-g/2 yc-g/2 xc+g/2 yc+g/2],numberOfGabors,1));
 centeredRects = centeredRects';
 
-
 %outputs
 out_soa = [];
 out_direction = []; 
 out_angle = [];  
 out_accuracy = [];
 out_RT = [];
-%% Experiment %%
 
-%Instructions
+% /////////////////////////////////////////////////////////////////////////
+%% Instructions %%
 Screen('FillRect',w,bgcolor);
-DrawFormattedText(w,'PRACTICE TRIALS','center','center');
+DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen. On EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the ''+'' sign at that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nPress SPACEBAR to continue.','center','center',[],wrapAt);
 Screen('Flip',w)
 WaitSecs(1);
 
-%% experiment
+% /////////////////////////////////////////////////////////////////////////
+%% ---- Experiment ----
+% /////////////////////////////////////////////////////////////////////////
 for k = -(practiceTrials+1):length(trialList)
     fprintf(num2str(k))
     fprintf('\n')
@@ -133,6 +145,7 @@ for k = -(practiceTrials+1):length(trialList)
     end
     arrayRects = arrayRects';
 
+% /////////////////////////////////////////////////////////////////////////
     %% Gabors
     rotation = round(rand(1, numberOfGabors) * 360);
     gaborPatch = Screen('MakeTexture',w,gaborMatrix);
@@ -141,6 +154,7 @@ for k = -(practiceTrials+1):length(trialList)
     %%%%%%%%
     %%%%%%%%
 
+% /////////////////////////////////////////////////////////////////////////    
     %% STIMULUS CODE %%
     HideCursor
     
@@ -201,6 +215,7 @@ for k = -(practiceTrials+1):length(trialList)
     %%%%%%%%
     %%%%%%%%
 
+% /////////////////////////////////////////////////////////////////////////    
     %% Probe %%
     Screen('FillRect',w,bgcolor,rect);
     Screen('Flip',w);
@@ -264,6 +279,7 @@ for k = -(practiceTrials+1):length(trialList)
 
     Screen('Close');  
 end
+% /////////////////////////////////////////////////////////////////////////
 fclose('all');
 Screen('CloseAll');
 
@@ -281,12 +297,18 @@ for this_soa = soas
     control_out(isoa) = sum(temp_cont)/length(temp_cont);
 end
 
+% /////////////////////////////////////////////////////////////////////////
+%% Save data
+save(Filename)
+% /////////////////////////////////////////////////////////////////////////
+%% Plot results
 figure; 
 plot(soas,turn_out,'r',soas,control_out,'b'); 
 legend({'Flexion','Control'});
 xlabel('Gabor Change First < ------ SOA (frames) ------ > Gabor Change After')
 ylabel('Detection Proportion')
 ylim([.5 1.05])
+% /////////////////////////////////////////////////////////////////////////
 
 function MoveStim()
     global arrayRects direction movementIncrement
@@ -302,3 +324,11 @@ function DrawStim()
     Screen('FillOval',w,fixationColor,fixationRect);  
     Screen('Flip',w);
 end
+
+
+
+
+
+
+
+
