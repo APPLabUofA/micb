@@ -57,7 +57,7 @@ timeLimit = 5;
 feedbackPause = .5;
 
 %pick soas
-soas = [-3:1:3];
+soas = [-3,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,3]; % now 11, up from 9, which was up from 7
 nsoas = length(soas);
 
 % /////////////////////////////////////////////////////////////////////////
@@ -105,9 +105,10 @@ out_RT = [];
 % /////////////////////////////////////////////////////////////////////////
 %% Instructions %%
 Screen('FillRect',w,bgcolor);
-DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen. On EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the ''+'' sign at that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nPress SPACEBAR to continue.','center','center',[],wrapAt);
+DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen.\n\nOn EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the dot that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nClick the mouse to continue.','center','center',[]);
 Screen('Flip',w)
-WaitSecs(1);
+GetClicks(w);
+WaitSecs(1.25);
 
 % /////////////////////////////////////////////////////////////////////////
 %% ---- Experiment ----
@@ -307,7 +308,7 @@ plot(soas,turn_out,'r',soas,control_out,'b');
 legend({'Flexion','Control'});
 xlabel('Gabor Change First < ------ SOA (frames) ------ > Gabor Change After')
 ylabel('Detection Proportion')
-ylim([.5 1.05])
+ylim([.01 1.05])
 % /////////////////////////////////////////////////////////////////////////
 
 function MoveStim()
