@@ -145,6 +145,7 @@ for k = -(practiceTrials+1):length(trialList)
     end
     arrayRects = arrayRects';
 
+% /////////////////////////////////////////////////////////////////////////
     %% Gabors
     rotation = round(rand(1, numberOfGabors) * 360);
     gaborPatch = Screen('MakeTexture',w,gaborMatrix);
@@ -190,7 +191,6 @@ for k = -(practiceTrials+1):length(trialList)
         if motion_howfar < 1 & ~motionOver
             motionOver = 1;
             % Change movement direction
-
             movementIncrement = repmat(movementSpeed.*[cosd(angle) ...
                                     sind(angle) cosd(angle) sind(angle)], ...
                                     numberOfGabors, 1)';
@@ -278,6 +278,7 @@ for k = -(practiceTrials+1):length(trialList)
 
     Screen('Close');  
 end
+% /////////////////////////////////////////////////////////////////////////
 fclose('all');
 Screen('CloseAll');
 
@@ -295,9 +296,10 @@ for this_soa = soas
     control_out(isoa) = sum(temp_cont)/length(temp_cont);
 end
 
+% /////////////////////////////////////////////////////////////////////////
 %% Save data
-save(Filename,'targ_grey');
-
+save(Filename)
+% /////////////////////////////////////////////////////////////////////////
 %% Plot results
 figure; 
 plot(soas,turn_out,'r',soas,control_out,'b'); 

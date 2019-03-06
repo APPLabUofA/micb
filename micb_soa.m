@@ -69,7 +69,8 @@ gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
 % /////////////////////////////////////////////////////////////////////////
 %% Counterbalancing
-reps = 5; % Number of reps per angle condition per direction
+% reps = 5; % Number of reps per angle condition per direction
+reps = 3; % Number of reps per angle condition per direction
 trialList = [repmat(1:numberOfGabors,1,3*reps);...  %list of which target
     zeros(1,numberOfGabors*reps) ...  %list of which angle
     repmat(90,1,numberOfGabors*reps)...
@@ -191,7 +192,6 @@ for k = -(practiceTrials+1):length(trialList)
         if motion_howfar < 1 & ~motionOver
             motionOver = 1;
             % Change movement direction
-
             movementIncrement = repmat(movementSpeed.*[cosd(angle) ...
                                     sind(angle) cosd(angle) sind(angle)], ...
                                     numberOfGabors, 1)';
