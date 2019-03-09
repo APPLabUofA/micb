@@ -57,7 +57,7 @@ timeLimit = 5;
 feedbackPause = .5;
 
 %pick soas
-soas = [-3,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,3]; % now 11, up from 9, which was up from 7
+soas = sort([-8:2:8,-1,1]); %changed SOAs 
 nsoas = length(soas);
 
 % /////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 % /////////////////////////////////////////////////////////////////////////
 %% Counterbalancing
 % reps = 5; % Number of reps per angle condition per direction
-reps = 3; % Number of reps per angle condition per direction
+reps = 4; % Number of reps per angle condition per direction
 trialList = [repmat(1:numberOfGabors,1,3*reps);...  %list of which target
     zeros(1,numberOfGabors*reps) ...  %list of which angle
     repmat(90,1,numberOfGabors*reps)...
