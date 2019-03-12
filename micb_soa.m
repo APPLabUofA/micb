@@ -268,7 +268,8 @@ for k = -(practiceTrials+1):length(trialList)
     WaitSecs(feedbackPause);
     Screen('FillRect',w,bgcolor,rect);
     Screen('flip',w);
-
+    
+    %//////////////////////////////////////////////////////////////////////
     if k==0 %end of practice trials
         Screen('FillRect',w,bgcolor);
         DrawFormattedText(w,'You have completed the practice trials\n\nLet the experimenter know you have completed the practice trials','center','center',[]);
@@ -288,7 +289,16 @@ for k = -(practiceTrials+1):length(trialList)
         out_accuracy = [out_accuracy accuracy];
         out_RT = [out_RT RT];
     end
-
+    %//////////////////////////////////////////////////////////////////////
+    %% Break %%
+    if mod(k,breakEvery)==0 %whenever k trials is divisible w/out remainder by breakEvery
+        Screen('FillRect',w,bgcolor);
+        DrawFormattedText(w,'Feel free to take a break at this time\n\nWhen you are ready, click the mouse to continue.','center','center',[]);
+        Screen('Flip',w)
+        GetClicks(w);
+        WaitSecs(1.25);
+    end
+    %//////////////////////////////////////////////////////////////////////
 
     Screen('Close');  
 end
