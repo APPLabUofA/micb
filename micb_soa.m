@@ -57,7 +57,7 @@ timeLimit = 5;
 feedbackPause = .5;
 
 %pick soas
-soas = [-3:1:3];
+soas = sort([-8:2:8,-1,1]); %changed SOAs 
 nsoas = length(soas);
 
 % /////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 % /////////////////////////////////////////////////////////////////////////
 %% Counterbalancing
 % reps = 5; % Number of reps per angle condition per direction
-reps = 3; % Number of reps per angle condition per direction
+reps = 4; % Number of reps per angle condition per direction
 trialList = [repmat(1:numberOfGabors,1,3*reps);...  %list of which target
     zeros(1,numberOfGabors*reps) ...  %list of which angle
     repmat(90,1,numberOfGabors*reps)...
@@ -105,9 +105,10 @@ out_RT = [];
 % /////////////////////////////////////////////////////////////////////////
 %% Instructions %%
 Screen('FillRect',w,bgcolor);
-DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen. On EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the ''+'' sign at that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nPress SPACEBAR to continue.','center','center',[],wrapAt);
+DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen.\n\nOn EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the dot that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nClick the mouse to continue.','center','center',[]);
 Screen('Flip',w)
-WaitSecs(1);
+GetClicks(w);
+WaitSecs(1.25);
 
 % /////////////////////////////////////////////////////////////////////////
 %% ---- Experiment ----
@@ -240,9 +241,25 @@ for k = -(practiceTrials+1):length(trialList)
             timesUp = 1;
         end
     end
-    
+    %%% Create a 4X8 double 
+    non_targets = centredRects(1:8);
+    %%% Reduce to a 4X7 by removing the target
+    non_targets(:,target) = [];
+    incorrectRect = centeredRects(:,non_targets);
+    incorrectRect = incorrectRect;
     correctRect = centeredRects(:,target);
     correctRect = correctRect';
+    
+    %%% KeySet for all dictionaries
+    incorrect_keySet = {'1','2','3','4','5','6','7'};
+    %%% X axis value keys
+    incorrect_valueSet_left = {non_targets(1,:)}; incorrect_valueSet_right = {non_targets(3,:)};
+    %%% Y axis value keys
+    incorrect_valueSet_bottom = {non_targets(2,:)}; incorrect_valueSet_top = {non_targets(4,:)};
+    %%% X axis map
+    incorrect_Map_left = containers.Map(incorrect_keySet,valueSet_time_1); incorrect_Map_right = containers.Map(incorrect_keySet,valueSet_time_2);
+    %%% Y axis map
+    incorrect_Map_top = containers.Map(incorrect_keySet,valueSet_time_2); incorrect_Map_bottom = containers.Map(incorrect_keySet,valueSet_time_2);
     
     if clicked==1&&x>=correctRect(1)&&x<=correctRect(3)&&y>=correctRect(2)&&y<=correctRect(4)
         accuracy = 1;
@@ -251,9 +268,22 @@ for k = -(practiceTrials+1):length(trialList)
         DrawFormattedText(w,'Correct','center','center');
         Screen('Flip',w);
     elseif clicked==1
+        for i = length(incorrect_keySet)
+            if x>=incorrect_Map_left(i)&&x<=incorrect_Map_right(i)&&y>=incorrect_Map_top(i)&&y<=incorrect_Map_bottom(i)
+                incorrect_gabor = i
+                accuracy = 0;
+                gabor_press = 1;
+                Screen('FillRect',w,bgcolor,rect);
+                DrawFormattedText(w,'Please Click on a Gabor','center','center');
+                RT = GetSecs-startTime;
+                Screen('Flip',w);
+            end
+        end
+    elseif clicked==1 %%x>&&
         accuracy = 0;
+        gabor_press = 0;
         Screen('FillRect',w,bgcolor,rect);
-        DrawFormattedText(w,'Incorrect','center','center');
+        DrawFormattedText(w,'Please Click on a Gabor','center','center');
         RT = GetSecs-startTime;
         Screen('Flip',w);
     elseif clicked == 0
@@ -307,7 +337,7 @@ plot(soas,turn_out,'r',soas,control_out,'b');
 legend({'Flexion','Control'});
 xlabel('Gabor Change First < ------ SOA (frames) ------ > Gabor Change After')
 ylabel('Detection Proportion')
-ylim([.5 1.05])
+ylim([.01 1.05])
 % /////////////////////////////////////////////////////////////////////////
 
 function MoveStim()
