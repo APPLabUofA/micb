@@ -51,7 +51,7 @@ movementSpeed = 3;
 rotationSize = 30;
 
 % trial parameters
-practiceTrials = 2;
+practiceTrials = 12;
 breakEvery = 50;
 timeLimit = 5;
 feedbackPause = .5;
@@ -269,7 +269,19 @@ for k = -(practiceTrials+1):length(trialList)
     Screen('FillRect',w,bgcolor,rect);
     Screen('flip',w);
 
-    if k>0
+    if k==0 %end of practice trials
+        Screen('FillRect',w,bgcolor);
+        DrawFormattedText(w,'You have completed the practice trials\n\nLet the experimenter know you have completed the practice trials','center','center',[]);
+        Screen('Flip',w)
+        GetClicks(w);
+        WaitSecs(0.05);
+        
+        Screen('FillRect',w,bgcolor);
+        DrawFormattedText(w,'When you are ready to start the experiment, click the mouse to continue.','center','center',[]);
+        Screen('Flip',w)
+        GetClicks(w);
+        WaitSecs(0.05);
+    elseif k>0 %save data of experimental trials
         out_soa = [out_soa this_soa];
         out_direction = [out_direction direction]; 
         out_angle = [out_angle angle];  %270 left, 90 Right, 0 straight
@@ -281,6 +293,7 @@ for k = -(practiceTrials+1):length(trialList)
     Screen('Close');  
 end
 % /////////////////////////////////////////////////////////////////////////
+
 fclose('all');
 Screen('CloseAll');
 
