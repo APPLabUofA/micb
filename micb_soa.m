@@ -113,7 +113,8 @@ WaitSecs(1.25);
 % /////////////////////////////////////////////////////////////////////////
 %% ---- Experiment ----
 % /////////////////////////////////////////////////////////////////////////
-for k = -(practiceTrials+1):length(trialList)
+% for k = -(practiceTrials+1):length(trialList)
+for k = 1:10
     fprintf(num2str(k))
     fprintf('\n')
     %pick SOA
@@ -150,6 +151,9 @@ for k = -(practiceTrials+1):length(trialList)
 % /////////////////////////////////////////////////////////////////////////
     %% Gabors
     rotation = round(rand(1, numberOfGabors) * 360);
+    if k >= 1
+        trial_rot{k} = rotation;
+    end
     gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
     %%%%%%%%
@@ -183,7 +187,7 @@ for k = -(practiceTrials+1):length(trialList)
         if max(arrayRects(3, :)) > rect(3)-xBorder || ...
                 max(arrayRects(4, :)) > rect(4)-yBorder || ...
                 min(arrayRects(3, :)) < xBorder || ...
-                min(arrayRects(4, :)) < yBorder;
+                min(arrayRects(4, :)) < yBorder
             trialOver = 1;
         end
 
@@ -241,22 +245,38 @@ for k = -(practiceTrials+1):length(trialList)
             timesUp = 1;
         end
     end
-    
+
+    incorrectRect = centeredRects(:,:);
     correctRect = centeredRects(:,target);
     correctRect = correctRect';
-    
+    gabor_press = 0;
+  
     if clicked==1&&x>=correctRect(1)&&x<=correctRect(3)&&y>=correctRect(2)&&y<=correctRect(4)
         accuracy = 1;
         RT = GetSecs-startTime;
         Screen('FillRect',w,bgcolor,rect);
         DrawFormattedText(w,'Correct','center','center');
-        Screen('Flip',w);
-    elseif clicked==1
-        accuracy = 0;
-        Screen('FillRect',w,bgcolor,rect);
-        DrawFormattedText(w,'Incorrect','center','center');
         RT = GetSecs-startTime;
         Screen('Flip',w);
+    elseif clicked==1
+        for i = 1:length(incorrectRect)
+            if x>=incorrectRect(1,i)&&x<=incorrectRect(3,i)&&y>=incorrectRect(2,i)&&y<=incorrectRect(4,i)%%%                
+                accuracy = 0;
+                gabor_press = 1;
+                Screen('FillRect',w,bgcolor,rect);
+                DrawFormattedText(w,'Incorrect Gabor','center','center');
+                RT = GetSecs-startTime;
+                Screen('Flip',w);
+                break
+            end
+        end
+        if gabor_press == 0
+            accuracy = -1;
+            Screen('FillRect',w,bgcolor,rect);
+            DrawFormattedText(w,'Incorrect Gabor','center','center'); %%%Please Click on a Gabor
+            RT = GetSecs-startTime;
+            Screen('Flip',w);
+        end
     elseif clicked == 0
         Screen('FillRect',w,bgcolor,rect);
         DrawFormattedText(w,'Please respond more quickly','center','center');
@@ -288,6 +308,9 @@ for k = -(practiceTrials+1):length(trialList)
         out_angle = [out_angle angle];  %270 left, 90 Right, 0 straight
         out_accuracy = [out_accuracy accuracy];
         out_RT = [out_RT RT];
+        if accuracy == 0
+            out_incorrect_gabor(k) = i; %% adds value i to the incorrect gabor array at trial k
+        end
     end
     %//////////////////////////////////////////////////////////////////////
     %% Break %%
