@@ -52,7 +52,7 @@ rotationSize = 30;
 
 % trial parameters
 practiceTrials = 10;
-breakEvery = 50;
+breakEvery = 48; %so equal # trials per block
 timeLimit = 5;
 feedbackPause = .5;
 
@@ -113,8 +113,7 @@ WaitSecs(1.25);
 % /////////////////////////////////////////////////////////////////////////
 %% ---- Experiment ----
 % /////////////////////////////////////////////////////////////////////////
-% for k = -(practiceTrials+1):length(trialList)
-for k = 1:10
+for k = -(practiceTrials+1):length(trialList)
     fprintf(num2str(k))
     fprintf('\n')
     %pick SOA
