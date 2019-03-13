@@ -95,13 +95,16 @@ centeredRects = [arrayCenters arrayCenters] + ...
         round(repmat([xc-g/2 yc-g/2 xc+g/2 yc+g/2],numberOfGabors,1));
 centeredRects = centeredRects';
 
-%outputs
+% /////////////////////////////////////////////////////////////////////////
+%% Set-up Output Variables
 out_soa = [];
 out_direction = []; 
 out_angle = [];  
 out_accuracy = [];
 out_RT = [];
+out_rotation = cell(1,length(trialList)); %pre-allocate
 
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 % /////////////////////////////////////////////////////////////////////////
 %% Instructions %%
 Screen('FillRect',w,bgcolor);
@@ -151,7 +154,7 @@ for k = -(practiceTrials+1):length(trialList)
     %% Gabors
     rotation = round(rand(1, numberOfGabors) * 360);
     if k >= 1
-        trial_rot{k} = rotation;
+        out_rotation{k} = rotation;
     end
     gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
@@ -254,7 +257,7 @@ for k = -(practiceTrials+1):length(trialList)
         accuracy = 1;
         RT = GetSecs-startTime;
         Screen('FillRect',w,bgcolor,rect);
-        DrawFormattedText(w,'Correct','center','center');
+        DrawFormattedText(w,'Correct!','center','center');
         RT = GetSecs-startTime;
         Screen('Flip',w);
     elseif clicked==1
@@ -263,7 +266,7 @@ for k = -(practiceTrials+1):length(trialList)
                 accuracy = 0;
                 gabor_press = 1;
                 Screen('FillRect',w,bgcolor,rect);
-                DrawFormattedText(w,'Incorrect Gabor','center','center');
+                DrawFormattedText(w,'Incorrect patch','center','center');
                 RT = GetSecs-startTime;
                 Screen('Flip',w);
                 break
@@ -272,7 +275,7 @@ for k = -(practiceTrials+1):length(trialList)
         if gabor_press == 0
             accuracy = -1;
             Screen('FillRect',w,bgcolor,rect);
-            DrawFormattedText(w,'Incorrect Gabor','center','center'); %%%Please Click on a Gabor
+            DrawFormattedText(w,'Incorrect patch','center','center'); %%%Please Click on a Gabor
             RT = GetSecs-startTime;
             Screen('Flip',w);
         end
@@ -309,11 +312,15 @@ for k = -(practiceTrials+1):length(trialList)
         out_RT = [out_RT RT];
         if accuracy == 0
             out_incorrect_gabor(k) = i; %% adds value i to the incorrect gabor array at trial k
+        else
+            out_incorrect_gabor(k) = NaN; %so dim matches other out_ variables
         end
     end
     %//////////////////////////////////////////////////////////////////////
     %% Break %%
-    if mod(k,breakEvery)==0 %whenever k trials is divisible w/out remainder by breakEvery
+    % k>0 so don't break during practice or at end of practice &
+    % k~=totalTrials so break screen does not show up at end of experiment
+    if k>0 && k~=totalTrials && mod(k,breakEvery)==0 %whenever k trials is divisible w/out remainder by breakEvery
         Screen('FillRect',w,bgcolor);
         DrawFormattedText(w,'Feel free to take a break at this time\n\nWhen you are ready, click the mouse to continue.','center','center',[]);
         Screen('Flip',w)
@@ -325,14 +332,21 @@ for k = -(practiceTrials+1):length(trialList)
     Screen('Close');  
 end
 % /////////////////////////////////////////////////////////////////////////
+% -------------------------------------------------------------------------
+% ------------------------------- END TASK -------------------------------- 
+% -------------------------------------------------------------------------
+% /////////////////////////////////////////////////////////////////////////
 
 fclose('all');
 Screen('CloseAll');
 
+%clearing unneeded variables from workspace before saving
+clear i accuracy RT x y timesUp clicked angle this_soa gabor_press
 
+% /////////////////////////////////////////////////////////////////////////
 turn_trials = out_angle ~= 0;
 control_trials = out_angle == 0;
-responded = out_accuracy ~= 2;
+responded = out_accuracy ~= 2; %select only trials with a response
 
 isoa = 0;
 for this_soa = soas
@@ -351,6 +365,7 @@ save(Filename)
 figure; 
 plot(soas,turn_out,'r',soas,control_out,'b'); 
 legend({'Flexion','Control'});
+xlim([min(soas) max(soas)]); xticks(min(soas):1:max(soas))
 xlabel('Gabor Change First < ------ SOA (frames) ------ > Gabor Change After')
 ylabel('Detection Proportion')
 ylim([.01 1.05])

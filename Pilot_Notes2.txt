@@ -5,7 +5,7 @@ a1 (Sarah) + b1 (Eden)
 
 Dot is good - compared to the fixation cross
 
-Add figuress to fixation cross
+Add figures to fixation cross
 
 When it went from almost flat to flat - easier to see
 
@@ -24,6 +24,16 @@ a3 + b3
 Add to instructions don't move the mouse until prompted for response
 
 Add a repeat on practice trials
+
+S^3:
+-Changed "Incorrect Gabor" to "Incorrect patch" because the stimuli are always referred to as "patches" in the instructions
+-Add ! to Correct because it seemed more appropriate 
+-Changed breaks so break screen does not show up at the end of practice & end of the experiment
+-> I think we will need at least 50+ practice trials cuz I felt like I continued to do improve through 96 trials
+
+Seemed like two Gabor patches moved together sometimes, but often picked the wrong one... 
+    check relationship between location of target patch & location of patch incorrectly selected 
+
 
 
 
