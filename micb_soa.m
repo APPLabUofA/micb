@@ -113,7 +113,8 @@ WaitSecs(1.25);
 % /////////////////////////////////////////////////////////////////////////
 %% ---- Experiment ----
 % /////////////////////////////////////////////////////////////////////////
-for k = -(practiceTrials+1):length(trialList)
+% for k = -(practiceTrials+1):length(trialList)
+for k = 1:10
     fprintf(num2str(k))
     fprintf('\n')
     %pick SOA
@@ -150,6 +151,9 @@ for k = -(practiceTrials+1):length(trialList)
 % /////////////////////////////////////////////////////////////////////////
     %% Gabors
     rotation = round(rand(1, numberOfGabors) * 360);
+    if k >= 1
+        trial_rot{k} = rotation;
+    end
     gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
     %%%%%%%%
@@ -183,7 +187,7 @@ for k = -(practiceTrials+1):length(trialList)
         if max(arrayRects(3, :)) > rect(3)-xBorder || ...
                 max(arrayRects(4, :)) > rect(4)-yBorder || ...
                 min(arrayRects(3, :)) < xBorder || ...
-                min(arrayRects(4, :)) < yBorder;
+                min(arrayRects(4, :)) < yBorder
             trialOver = 1;
         end
 
@@ -241,51 +245,38 @@ for k = -(practiceTrials+1):length(trialList)
             timesUp = 1;
         end
     end
-    %%% Create a 4X8 double 
-    non_targets = centredRects(1:8);
-    %%% Reduce to a 4X7 by removing the target
-    non_targets(:,target) = [];
-    incorrectRect = centeredRects(:,non_targets);
-    incorrectRect = incorrectRect;
+
+    incorrectRect = centeredRects(:,:);
     correctRect = centeredRects(:,target);
     correctRect = correctRect';
-    
-    %%% KeySet for all dictionaries
-    incorrect_keySet = {'1','2','3','4','5','6','7'};
-    %%% X axis value keys
-    incorrect_valueSet_left = {non_targets(1,:)}; incorrect_valueSet_right = {non_targets(3,:)};
-    %%% Y axis value keys
-    incorrect_valueSet_bottom = {non_targets(2,:)}; incorrect_valueSet_top = {non_targets(4,:)};
-    %%% X axis map
-    incorrect_Map_left = containers.Map(incorrect_keySet,valueSet_time_1); incorrect_Map_right = containers.Map(incorrect_keySet,valueSet_time_2);
-    %%% Y axis map
-    incorrect_Map_top = containers.Map(incorrect_keySet,valueSet_time_2); incorrect_Map_bottom = containers.Map(incorrect_keySet,valueSet_time_2);
-    
+    gabor_press = 0;
+  
     if clicked==1&&x>=correctRect(1)&&x<=correctRect(3)&&y>=correctRect(2)&&y<=correctRect(4)
         accuracy = 1;
         RT = GetSecs-startTime;
         Screen('FillRect',w,bgcolor,rect);
         DrawFormattedText(w,'Correct','center','center');
+        RT = GetSecs-startTime;
         Screen('Flip',w);
     elseif clicked==1
-        for i = length(incorrect_keySet)
-            if x>=incorrect_Map_left(i)&&x<=incorrect_Map_right(i)&&y>=incorrect_Map_top(i)&&y<=incorrect_Map_bottom(i)
-                incorrect_gabor = i
+        for i = 1:length(incorrectRect)
+            if x>=incorrectRect(1,i)&&x<=incorrectRect(3,i)&&y>=incorrectRect(2,i)&&y<=incorrectRect(4,i)%%%                
                 accuracy = 0;
                 gabor_press = 1;
                 Screen('FillRect',w,bgcolor,rect);
-                DrawFormattedText(w,'Please Click on a Gabor','center','center');
+                DrawFormattedText(w,'Incorrect Gabor','center','center');
                 RT = GetSecs-startTime;
                 Screen('Flip',w);
+                break
             end
         end
-    elseif clicked==1 %%x>&&
-        accuracy = 0;
-        gabor_press = 0;
-        Screen('FillRect',w,bgcolor,rect);
-        DrawFormattedText(w,'Please Click on a Gabor','center','center');
-        RT = GetSecs-startTime;
-        Screen('Flip',w);
+        if gabor_press == 0
+            accuracy = -1;
+            Screen('FillRect',w,bgcolor,rect);
+            DrawFormattedText(w,'Incorrect Gabor','center','center'); %%%Please Click on a Gabor
+            RT = GetSecs-startTime;
+            Screen('Flip',w);
+        end
     elseif clicked == 0
         Screen('FillRect',w,bgcolor,rect);
         DrawFormattedText(w,'Please respond more quickly','center','center');
@@ -304,6 +295,9 @@ for k = -(practiceTrials+1):length(trialList)
         out_angle = [out_angle angle];  %270 left, 90 Right, 0 straight
         out_accuracy = [out_accuracy accuracy];
         out_RT = [out_RT RT];
+        if accuracy == 0
+            out_incorrect_gabor(k) = i; %% adds value i to the incorrect gabor array at trial k
+        end
     end
 
 
