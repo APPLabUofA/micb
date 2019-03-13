@@ -1,10 +1,9 @@
+
+Version-2 is the most recent version of the code.
+
 a1 (Sarah) + b1 (Eden)
 
-Doesn't differentiate between incorrect - not an appropriate response 
-	record where incorrect response is
 Dot is good - compared to the fixation cross
-
-Update the instructions
 
 Add figuress to fixation cross
 
@@ -12,7 +11,7 @@ When it went from almost flat to flat - easier to see
 
 When it matches up to orientation to the gabor opposite 
 
-Head still, moving just the eyes
+Head still, moving just the eyes <- will use a head rest
 
 Fades quickly - some variation in people engaging in the motor movement before prompted
 
@@ -23,8 +22,6 @@ a2 + b2
 a3 + b3
 
 Add to instructions don't move the mouse until prompted for response
-
-break into more manageable blocks - psuedo randomized within each block - doesn't overwrite
 
 Add a repeat on practice trials
 
