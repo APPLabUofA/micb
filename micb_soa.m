@@ -51,13 +51,13 @@ movementSpeed = 3;
 rotationSize = 30;
 
 % trial parameters
-practiceTrials = 12;
+practiceTrials = 10;
 breakEvery = 50;
 timeLimit = 5;
 feedbackPause = .5;
 
 %pick soas
-soas = sort([-8:2:8,-1,1]); %changed SOAs 
+soas = sort([-7:2:7,0]); %changed SOAs 
 nsoas = length(soas);
 
 % /////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ out_RT = [];
 % /////////////////////////////////////////////////////////////////////////
 %% Instructions %%
 Screen('FillRect',w,bgcolor);
-DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen.\n\nOn EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the dot that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nClick the mouse to continue.','center','center',[]);
+DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen.\n\nOn EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the dot that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nClick the mouse to start the practice trials.','center','center',[]);
 Screen('Flip',w)
 GetClicks(w);
 WaitSecs(1.25);
@@ -272,7 +272,7 @@ for k = -(practiceTrials+1):length(trialList)
     %//////////////////////////////////////////////////////////////////////
     if k==0 %end of practice trials
         Screen('FillRect',w,bgcolor);
-        DrawFormattedText(w,'You have completed the practice trials\n\nLet the experimenter know you have completed the practice trials','center','center',[]);
+        DrawFormattedText(w,'You have completed the practice trials\n\nLet the experimenter know you if you have questions.','center','center',[]);
         Screen('Flip',w)
         GetClicks(w);
         WaitSecs(0.05);
