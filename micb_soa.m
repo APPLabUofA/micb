@@ -369,6 +369,10 @@ xlim([min(soas) max(soas)]); xticks(min(soas):1:max(soas))
 xlabel('Gabor Change First < ------ SOA (frames) ------ > Gabor Change After')
 ylabel('Detection Proportion')
 ylim([.01 1.05])
+
+% Save figure
+savefig([Info.number '--' Info.date '_plot'])
+
 % /////////////////////////////////////////////////////////////////////////
 
 function MoveStim()
