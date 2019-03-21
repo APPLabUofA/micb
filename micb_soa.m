@@ -51,13 +51,13 @@ movementSpeed = 3;
 rotationSize = 30;
 
 % trial parameters
-practiceTrials = 2;
-breakEvery = 50;
+practiceTrials = 30;
+breakEvery = 48; %so equal # trials per block (5 blocks at reps = 5)
 timeLimit = 5;
 feedbackPause = .5;
 
 %pick soas
-soas = [-3:1:3];
+soas = sort([-7:2:7,0]); %changed SOAs 
 nsoas = length(soas);
 
 % /////////////////////////////////////////////////////////////////////////
@@ -69,8 +69,8 @@ gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
 % /////////////////////////////////////////////////////////////////////////
 %% Counterbalancing
-% reps = 5; % Number of reps per angle condition per direction
-reps = 3; % Number of reps per angle condition per direction
+reps = 5; % Number of reps per angle condition per direction
+% reps = 4; % Number of reps per angle condition per direction
 trialList = [repmat(1:numberOfGabors,1,3*reps);...  %list of which target
     zeros(1,numberOfGabors*reps) ...  %list of which angle
     repmat(90,1,numberOfGabors*reps)...
@@ -95,19 +95,23 @@ centeredRects = [arrayCenters arrayCenters] + ...
         round(repmat([xc-g/2 yc-g/2 xc+g/2 yc+g/2],numberOfGabors,1));
 centeredRects = centeredRects';
 
-%outputs
+% /////////////////////////////////////////////////////////////////////////
+%% Set-up Output Variables
 out_soa = [];
 out_direction = []; 
 out_angle = [];  
 out_accuracy = [];
 out_RT = [];
+out_rotation = cell(1,length(trialList)); %pre-allocate
 
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 % /////////////////////////////////////////////////////////////////////////
 %% Instructions %%
 Screen('FillRect',w,bgcolor);
-DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen. On EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the ''+'' sign at that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nPress SPACEBAR to continue.','center','center',[],wrapAt);
+DrawFormattedText(w,'In the following task, you will follow, with your eyes, an array of striped patches moving across the screen.\n\nOn EVERY TRIAL, one of the patches will rotate slightly while moving with its neighbors. When prompted, you will have to click on the patch that rotated.\n\nWe are testing what conditions make that rotation harder or easier to see, so do not be surprised if you did not see any rotation. Just do your best and take a guess if you are unsure.\n\nThe task is easiest if you follow the dot that appears at the middle of the array, so follow that with your eyes on each trial.\n\n\nLet the experimenter know if you have any questions.\n\nClick the mouse to start the practice trials.','center','center',[]);
 Screen('Flip',w)
-WaitSecs(1);
+GetClicks(w);
+WaitSecs(1.25);
 
 % /////////////////////////////////////////////////////////////////////////
 %% ---- Experiment ----
@@ -149,6 +153,9 @@ for k = -(practiceTrials+1):length(trialList)
 % /////////////////////////////////////////////////////////////////////////
     %% Gabors
     rotation = round(rand(1, numberOfGabors) * 360);
+    if k >= 1
+        out_rotation{k} = rotation;
+    end
     gaborPatch = Screen('MakeTexture',w,gaborMatrix);
 
     %%%%%%%%
@@ -182,7 +189,7 @@ for k = -(practiceTrials+1):length(trialList)
         if max(arrayRects(3, :)) > rect(3)-xBorder || ...
                 max(arrayRects(4, :)) > rect(4)-yBorder || ...
                 min(arrayRects(3, :)) < xBorder || ...
-                min(arrayRects(4, :)) < yBorder;
+                min(arrayRects(4, :)) < yBorder
             trialOver = 1;
         end
 
@@ -240,22 +247,38 @@ for k = -(practiceTrials+1):length(trialList)
             timesUp = 1;
         end
     end
-    
+
+    incorrectRect = centeredRects(:,:);
     correctRect = centeredRects(:,target);
     correctRect = correctRect';
-    
+    gabor_press = 0;
+  
     if clicked==1&&x>=correctRect(1)&&x<=correctRect(3)&&y>=correctRect(2)&&y<=correctRect(4)
         accuracy = 1;
         RT = GetSecs-startTime;
         Screen('FillRect',w,bgcolor,rect);
-        DrawFormattedText(w,'Correct','center','center');
-        Screen('Flip',w);
-    elseif clicked==1
-        accuracy = 0;
-        Screen('FillRect',w,bgcolor,rect);
-        DrawFormattedText(w,'Incorrect','center','center');
+        DrawFormattedText(w,'Correct!','center','center');
         RT = GetSecs-startTime;
         Screen('Flip',w);
+    elseif clicked==1
+        for i = 1:length(incorrectRect)
+            if x>=incorrectRect(1,i)&&x<=incorrectRect(3,i)&&y>=incorrectRect(2,i)&&y<=incorrectRect(4,i)%%%                
+                accuracy = 0;
+                gabor_press = 1;
+                Screen('FillRect',w,bgcolor,rect);
+                DrawFormattedText(w,'Incorrect patch','center','center');
+                RT = GetSecs-startTime;
+                Screen('Flip',w);
+                break
+            end
+        end
+        if gabor_press == 0
+            accuracy = -1;
+            Screen('FillRect',w,bgcolor,rect);
+            DrawFormattedText(w,'Incorrect patch','center','center'); %%%Please Click on a Gabor
+            RT = GetSecs-startTime;
+            Screen('Flip',w);
+        end
     elseif clicked == 0
         Screen('FillRect',w,bgcolor,rect);
         DrawFormattedText(w,'Please respond more quickly','center','center');
@@ -267,26 +290,63 @@ for k = -(practiceTrials+1):length(trialList)
     WaitSecs(feedbackPause);
     Screen('FillRect',w,bgcolor,rect);
     Screen('flip',w);
-
-    if k>0
+    
+    %//////////////////////////////////////////////////////////////////////
+    if k==0 %end of practice trials
+        Screen('FillRect',w,bgcolor);
+        DrawFormattedText(w,'You have completed the practice trials\n\nLet the experimenter know you if you have questions.','center','center',[]);
+        Screen('Flip',w)
+        GetClicks(w);
+        WaitSecs(0.05);
+        
+        Screen('FillRect',w,bgcolor);
+        DrawFormattedText(w,'When you are ready to start the experiment, click the mouse to continue.','center','center',[]);
+        Screen('Flip',w)
+        GetClicks(w);
+        WaitSecs(0.05);
+    elseif k>0 %save data of experimental trials
         out_soa = [out_soa this_soa];
         out_direction = [out_direction direction]; 
         out_angle = [out_angle angle];  %270 left, 90 Right, 0 straight
         out_accuracy = [out_accuracy accuracy];
         out_RT = [out_RT RT];
+        if accuracy == 0
+            out_incorrect_gabor(k) = i; %% adds value i to the incorrect gabor array at trial k
+        else
+            out_incorrect_gabor(k) = NaN; %so dim matches other out_ variables
+        end
     end
-
+    %//////////////////////////////////////////////////////////////////////
+    %% Break %%
+    % k>0 so don't break during practice or at end of practice &
+    % k~=totalTrials so break screen does not show up at end of experiment
+    if k>0 && k~=totalTrials && mod(k,breakEvery)==0 %whenever k trials is divisible w/out remainder by breakEvery
+        Screen('FillRect',w,bgcolor);
+        DrawFormattedText(w,'Feel free to take a break at this time\n\nWhen you are ready, click the mouse to continue.','center','center',[]);
+        Screen('Flip',w)
+        GetClicks(w);
+        WaitSecs(1.25);
+    end
+    %//////////////////////////////////////////////////////////////////////
 
     Screen('Close');  
 end
 % /////////////////////////////////////////////////////////////////////////
+% -------------------------------------------------------------------------
+% ------------------------------- END TASK -------------------------------- 
+% -------------------------------------------------------------------------
+% /////////////////////////////////////////////////////////////////////////
+
 fclose('all');
 Screen('CloseAll');
 
+%clearing unneeded variables from workspace before saving
+clear i accuracy RT x y timesUp clicked angle this_soa gabor_press
 
+% /////////////////////////////////////////////////////////////////////////
 turn_trials = out_angle ~= 0;
 control_trials = out_angle == 0;
-responded = out_accuracy ~= 2;
+responded = out_accuracy ~= 2; %select only trials with a response
 
 isoa = 0;
 for this_soa = soas
@@ -305,9 +365,14 @@ save(Filename)
 figure; 
 plot(soas,turn_out,'r',soas,control_out,'b'); 
 legend({'Flexion','Control'});
+xlim([min(soas) max(soas)]); xticks(min(soas):1:max(soas))
 xlabel('Gabor Change First < ------ SOA (frames) ------ > Gabor Change After')
 ylabel('Detection Proportion')
-ylim([.5 1.05])
+ylim([.01 1.05])
+
+% Save figure
+savefig([Info.number '--' Info.date '_plot'])
+
 % /////////////////////////////////////////////////////////////////////////
 
 function MoveStim()
