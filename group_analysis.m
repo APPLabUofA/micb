@@ -25,15 +25,15 @@ for i_sub = 1:nsubs
 	end
 
 	%% Plot results
-	subplot(widthHeight,widthHeight,i_sub); 
-		plot(soas,turn_out,'r',soas,control_out,'b'); 
-			legend({'Flexion','Control'});
-			xlim([min(soas) max(soas)]); 
-			set(gca,'XTick',min(soas):1:max(soas))
-			xlabel('Gabor First < -- SOA (frames) -- > Gabor After')
-			ylabel('Detection Proportion')
-			ylim([.01 1.05])
-			title(current_sub)
+% 	subplot(widthHeight,widthHeight,i_sub); 
+% 		plot(soas,turn_out,'r',soas,control_out,'b'); 
+% 			legend({'Flexion','Control'});
+% 			xlim([min(soas) max(soas)]); 
+% 			set(gca,'XTick',min(soas):1:max(soas))
+% 			xlabel('Gabor First < -- SOA (frames) -- > Gabor After')
+% 			ylabel('Detection Proportion')
+% 			ylim([.01 1.05])
+% 			title(current_sub)
 
 	turn_group(i_sub,:) = turn_out;
 	control_group(i_sub,:) = control_out;
@@ -52,3 +52,8 @@ figure;
 	ylabel('Detection Proportion')
 	ylim([.01 1.05])
 	title('Grand Average')
+    
+    
+    
+    
+    
