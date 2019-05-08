@@ -1,4 +1,3 @@
-%% Fix counts - differentiate - messing with weighted values > block 1
 %% Include colour differentiation of soa
 
 
@@ -348,10 +347,7 @@ for i_subs = 1:nsubs
 			set(gca,'XTick',0:20:180)
 			xlabel('Incorrect Gabor Orientation Difference')
 			ylabel('Reaction Time')
-			title(current_sub)
-    
-    
-    
+			title(current_sub) 
 end
 
 Ori_T_Diff_Mean = zeros(1,nsubs);
@@ -380,23 +376,91 @@ Ori_T_Diff_SE = std(Ori_T_Diff_Mean);
 % ylabel('Reaction Time (ms)');
 
 %% Looking at the incorrect trial gabor orientation as a function of correct gabor orientation
-count = 0;
-Orient_Cor = zeros(5,lengthy); % Incorrect Experimental
+figure('Position',[25,25,1000,1000]); 
+widthHeight = ceil(sqrt(nsubs));
 
-for i = 1:lengthy
-    if isnan(out_incorrect_gabor(i)) ~= true 
-        count = count + 1;
-        Orient_Cor(1,count) = i; Orient_Cor(2,count) = out_incorrect_gabor(i);
-        Orient_Cor(3,count) = out_rotation{i}(trialList(i,1)); % correct gabor
-        Orient_Cor(4,count) = out_rotation{i}(Orient_Cor(2,count)); % incorrect gabor
-        normDeg = mod(Orient_Cor(3,count) - Orient_Cor(4,count),360);
-        Orient_Cor(5,count) = min(360-normDeg, normDeg);
-        Orient_Cor(6,count) = out_RT(i)
+for i_subs = 1:nsubs
+    count = 0;
+    current_sub = sub_nums{i_subs};
+    
+    par_str5(i_subs).Orient_Cor = zeros(8,lengthy);
+
+    %Find output filename
+	Filename = dir(['.\Data\' current_sub '*']);
+
+	load(['.\Data\' Filename.name]);
+
+    for i = 1:lengthy
+        if isnan(out_incorrect_gabor(i)) ~= true 
+            count = count + 1;
+            par_str5(i_subs).Orient_Cor(1,count) = i; par_str5(i_subs).Orient_Cor(2,count) = out_incorrect_gabor(i);
+            par_str5(i_subs).Orient_Cor(3,count) = out_rotation{i}(trialList(i,1)); % correct gabor
+            par_str5(i_subs).Orient_Cor(4,count) = out_rotation{i}(par_str5(i_subs).Orient_Cor(2,count)); % incorrect gabor
+            normDeg = mod(par_str5(i_subs).Orient_Cor(3,count) - par_str5(i_subs).Orient_Cor(4,count),360);
+            par_str5(i_subs).Orient_Cor(5,count) = min(360-normDeg, normDeg);
+            par_str5(i_subs).Orient_Cor(6,count) = out_RT(i);
+            par_str5(i_subs).Orient_Cor(7,count) = out_soa(i);
+
+        end
     end
+    par_str5(i_subs).Orient_Count = count;
+    % Look at correlating individual reaction times under 2 seconds with
+    % overall difference sums for each SOA (different colours
+    par_str5(i_subs).Orient_Cor_Sum = sum(par_str5(i_subs).Orient_Cor(5,:));
+    par_str5(i_subs).Orient_Cor_Weighted = par_str5(i_subs).Orient_Cor_Sum/count;
+    par_str5(i_subs).Orient_Cor_Diff = sum(par_str5(i_subs).Orient_Cor(5,:));
+    par_str5(i_subs).Orient_Cor_std = std(par_str5(i_subs).Orient_Cor(5,:));
+
+    subplot(widthHeight,widthHeight,i_subs); 
+%         c = gradient(y);
+%         c = par_str5(i_subs).Orient_Cor(7,count);
+%         scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,:),par_str5(i_subs).Orient_Cor(7,count))
+%         scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,:),'b')
+            for i=1:length(par_str5(i_subs).Orient_Cor(6,:))
+                %Select color
+                if par_str5(i_subs).Orient_Cor(6,i) < 0
+                    mycolor = 'r';
+                else
+                    mycolor = 'g';
+                end
+                plot(par_str5(i_subs).Orient_Cor(5,i), par_str5(i_subs).Orient_Cor(6,i), 'sk','markersize',8,'markerfacecolor',mycolor);
+            end
+            legend({'Counterclockwise','Clockwise'});
+			xlim([0 180]); 
+			set(gca,'XTick',0:20:180)
+			xlabel('Incorrect Gabor Orientation Difference')
+			ylabel('Reaction Time')
+			title(current_sub)
 end
 
-Orient_Cor_Sum = sum(Orient_Cor(5,:));
-Orient_Cor_Weighted = Orient_Cor_Sum/count;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+t = 0:0.03:3;
+y = sin(2*pi.*t);
+
+figure; hold on;
+plot(t,y,'k');
+grid;
+
+for i=1:length(y)
+
+    %Select color
+    if y(i)<0
+        mycolor = 'r';
+    else
+        mycolor = 'g';
+    end
+
+    plot(t(i), y(i), 'sk','markersize',8,'markerfacecolor',mycolor);
+
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Ori_Cor_Diff_Mean = zeros(1,nsubs);
+
+for i = 1:nsubs
+    Ori_Cor_Diff_Mean(i) = par_str5(i).Orient_Cor_Weighted;
+end
+Ori_Cor_Diff_GA = mean(Ori_Cor_Diff_Mean);
+Ori_Cor_Diff_SE = std(Ori_Cor_Diff_Mean);
 
 % Look at reaction time as a function of correct gabor orientation
 
