@@ -20,6 +20,8 @@ sub_nums = {'000', '001', '002', '003', '004', '005', '006', '007',...
 		
 nsubs = length(sub_nums);
 
+ColorMap = containers.Map({-7,-5,-3,-1,0,1,3,5,7},{[230/255 25/255 75/255],[245/255 130/255 48/255],[255/255 225/255 25/255],[210/255 245/255 60/255],[0 0 0],[70/255 240/255 240/255],[0 130/255 200/255],[145/255 30/255 180/255],[240/255 50/255 230/255]});
+% ColorMap = [[230 25 75],[245 130 48],[255 225 25],[210 245 60],[0 0 0],[70 240 240],[0 130 200],[145 30 180],[240 50 230]];
 
 %% Looking at the incorrect gabor distances as a function of direction
 
@@ -337,10 +339,12 @@ for i_subs = 1:nsubs
     par_str4(i_subs).Orient_T_R_Weighted = par_str4(i_subs).Orient_T_R_Sum/count;
     par_str4(i_subs).Orient_T_R_std = std(par_str4(i_subs).Orient_T(6,:));
     
+    % switch - 
+    
     subplot(widthHeight,widthHeight,i_subs); 
-        scatter(par_str4(i_subs).Orient_T(4,:),par_str4(i_subs).Orient_T(8,:),'b')
+        scatter(par_str4(i_subs).Orient_T(4,:),par_str4(i_subs).Orient_T(8,:),25,'b','filled')
         hold on
-        scatter(par_str4(i_subs).Orient_T(6,:),par_str4(i_subs).Orient_T(8,:),'r')
+        scatter(par_str4(i_subs).Orient_T(6,:),par_str4(i_subs).Orient_T(8,:),25,'r','filled')
         hold off
 			legend({'Counterclockwise','Clockwise'});
 			xlim([0 180]); 
@@ -353,7 +357,7 @@ end
 Ori_T_Diff_Mean = zeros(1,nsubs);
 
 for i = 1:nsubs
-    Ori_T_Diff_Mean(i) = par_str2(i).Orient_T_L_Weighted - par_str2(i).Orient_T_R_Weighted;
+    Ori_T_Diff_Mean(i) = par_str4(i).Orient_T_L_Weighted - par_str4(i).Orient_T_R_Weighted;
 end
 Ori_T_Diff_GA = mean(Ori_T_Diff_Mean);
 Ori_T_Diff_SE = std(Ori_T_Diff_Mean);
@@ -401,6 +405,7 @@ for i_subs = 1:nsubs
             par_str5(i_subs).Orient_Cor(6,count) = out_RT(i);
             par_str5(i_subs).Orient_Cor(7,count) = out_soa(i);
 
+%             par_str5(i_subs).Orient_Cor(7,count) = [[ColorMap(out_soa(i))]];
         end
     end
     par_str5(i_subs).Orient_Count = count;
@@ -411,48 +416,48 @@ for i_subs = 1:nsubs
     par_str5(i_subs).Orient_Cor_Diff = sum(par_str5(i_subs).Orient_Cor(5,:));
     par_str5(i_subs).Orient_Cor_std = std(par_str5(i_subs).Orient_Cor(5,:));
 
-    subplot(widthHeight,widthHeight,i_subs); 
-%         c = gradient(y);
-%         c = par_str5(i_subs).Orient_Cor(7,count);
-%         scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,:),par_str5(i_subs).Orient_Cor(7,count))
-%         scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,:),'b')
-            for i=1:length(par_str5(i_subs).Orient_Cor(6,:))
-                %Select color
-                if par_str5(i_subs).Orient_Cor(6,i) < 0
-                    mycolor = 'r';
-                else
-                    mycolor = 'g';
-                end
-                plot(par_str5(i_subs).Orient_Cor(5,i), par_str5(i_subs).Orient_Cor(6,i), 'sk','markersize',8,'markerfacecolor',mycolor);
-            end
-            legend({'Counterclockwise','Clockwise'});
-			xlim([0 180]); 
-			set(gca,'XTick',0:20:180)
-			xlabel('Incorrect Gabor Orientation Difference')
-			ylabel('Reaction Time')
-			title(current_sub)
-end
+%     subplot(widthHeight,widthHeight,i_subs); 
+% %         c = gradient(y);
+% %         c = par_str5(i_subs).Orient_Cor(7,count);
+%         scatter(par_str5(i_subs).Orient_Cor(5,1:count),par_str5(i_subs).Orient_Cor(6,1:count),[],par_str5(i_subs).Orient_Cor(7,1:count), 'filled')
+% %          scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,),'b')
+%             legend({'Counterclockwise','Clockwise'});
+% 			xlim([0 180]); 
+% 			set(gca,'XTick',0:20:180)
+% 			xlabel('Incorrect Gabor Orientation Difference')
+% 			ylabel('Reaction Time')
+% 			title(current_sub)
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-t = 0:0.03:3;
-y = sin(2*pi.*t);
-
-figure; hold on;
-plot(t,y,'k');
-grid;
-
-for i=1:length(y)
-
-    %Select color
-    if y(i)<0
-        mycolor = 'r';
-    else
-        mycolor = 'g';
-    end
-
-    plot(t(i), y(i), 'sk','markersize',8,'markerfacecolor',mycolor);
-
+    subplot(widthHeight,widthHeight,i_subs); 
+% %         c = gradient(y);
+% %         c = par_str5(i_subs).Orient_Cor(7,count);
+% %         scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,:),par_str5(i_subs).Orient_Cor(7,count))
+% %         scatter(par_str5(i_subs).Orient_Cor(5,:),par_str5(i_subs).Orient_Cor(6,:),'b')
+        for i_point=1:count
+          hold on
+          % Get the color for this subject from the summer colormap.
+%           markerColour = ColorMap(i_subj,:);
+          plot(par_str5(i_subs).Orient_Cor(5,i_point), par_str5(i_subs).Orient_Cor(6,i_point),'sk','markersize',8,'markerfacecolor',ColorMap(par_str5(i_subs).Orient_Cor(7,i_point)));
+        end
+%             for i=1:length(par_str5(i_subs).Orient_Cor(6,:))
+%                 %Select color
+%                 if par_str5(i_subs).Orient_Cor(6,i) < 0
+%                     mycolor = 'r';
+%                 else
+%                     mycolor = 'g';
+%                 end
+%                 plot(par_str5(i_subs).Orient_Cor(5,i), par_str5(i_subs).Orient_Cor(6,i), 'sk','markersize',8,'markerfacecolor',mycolor);
+%             end
+        legend({'Counterclockwise','Clockwise'});
+        xlim([0 180]); 
+        set(gca,'XTick',0:20:180)
+        xlabel('Incorrect Gabor Orientation Difference')
+        ylabel('Reaction Time')
+        title(current_sub)
 end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Ori_Cor_Diff_Mean = zeros(1,nsubs);
 
@@ -478,13 +483,6 @@ Ori_Cor_Diff_SE = std(Ori_Cor_Diff_Mean);
 % xlabel('Angle Difference (degrees)');
 % ylabel('Reaction Time (ms)');
 
-Cond_Diff_Mean = zeros(1,nsubs);
-
-for i = 1:nsubs
-    Ori_Diff_Mean(i) = par_str2(i).Incor_Con_Weighted - par_str2(i).Incor_Exp_Weighted;
-end
-
-Ori_Diff_SE = std(Cond_Diff_Mean);
 
 %%
 [x,y,z] = peaks;
