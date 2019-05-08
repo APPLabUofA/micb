@@ -82,9 +82,9 @@ for i_sub = 1:nsubs
     for this_soa = soas
         isoa = isoa + 1;
         temp_turn = out_RT(out_soa == this_soa & responded & turn_trials);
-        turn_outRT(isoa) = mean(temp_turn);
+        turn_outRT(isoa) = median(temp_turn);
         temp_cont = out_RT(out_soa == this_soa & responded & control_trials);
-        control_outRT(isoa) = mean(temp_cont);
+        control_outRT(isoa) = median(temp_cont);
         clear temp_turn temp_cont
     end
     
