@@ -233,8 +233,10 @@ for i_subs = 1:nsubs
         SOA_dist_exp_std(ii) = std(par_str2(i_subs).Incor_Exp(5,par_str2(i_subs).Incor_Exp(6,1:count2) == soas(ii)));
     end
     subplot(widthHeight,widthHeight,i_subs); 
-    errorbar(soas,SOA_dist_con_mean,SOA_dist_std,'r')
-    errorbar(soas,SOA_dist_exp_mean,SOA_dist_std,'b'); 
+    errorbar(soas,SOA_dist_con_mean,SOA_dist_con_std,'r')
+    hold on;
+    errorbar(soas,SOA_dist_exp_mean,SOA_dist_exp_std,'b'); 
+    hold off;
         legend({'Control','Experimental'});
         xlim([min(soas) max(soas)]); 
         set(gca,'XTick',min(soas):1:max(soas))
